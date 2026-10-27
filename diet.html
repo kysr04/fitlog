@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>饮食 · FitLog 训练日志</title>
+<meta name="description" content="记录每天吃了什么：热量、蛋白质、碳水、脂肪自动计算，和每日目标对比。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="diet">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">饮食</p>
+      <h1 class="h1">今天吃了什么</h1>
+      <p>选食物、填份量，热量和三大营养素自动算。</p>
+    </div>
+    <div class="row">
+      <button class="icon-btn" id="prevDay" type="button" aria-label="前一天">←</button>
+      <input class="input" type="date" id="dietDate" style="width:auto;min-height:38px;padding:7px 10px">
+      <button class="icon-btn" id="nextDay" type="button" aria-label="后一天">→</button>
+      <button class="btn btn-sm" id="todayBtn" type="button">回到今天</button>
+    </div>
+  </div>
+
+  <div class="grid grid-side">
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">今日摄入</h2>
+        <span class="small muted" id="dietDayLabel"></span>
+      </header>
+      <div class="row" style="gap:22px;align-items:center">
+        <div id="dietRing" aria-label="热量完成度"></div>
+        <div class="macro-list" style="flex:1 1 220px">
+          <div class="macro"><div class="macro-head"><b>热量</b><span id="dietKcalText">0 / 0 kcal</span></div><div class="bar"><i id="dietKcalBar" style="width:0%"></i></div></div>
+          <div class="macro is-protein"><div class="macro-head"><b>蛋白质</b><span id="dietProteinText">0 / 0 g</span></div><div class="bar is-protein"><i id="dietProteinBar" style="width:0%"></i></div></div>
+          <div class="macro is-carb"><div class="macro-head"><b>碳水</b><span id="dietCarbText">0 / 0 g</span></div><div class="bar is-carb"><i id="dietCarbBar" style="width:0%"></i></div></div>
+          <div class="macro is-fat"><div class="macro-head"><b>脂肪</b><span id="dietFatText">0 / 0 g</span></div><div class="bar is-fat"><i id="dietFatBar" style="width:0%"></i></div></div>
+        </div>
+      </div>
+      <p class="small muted mt-3" id="dietTip"></p>
+    </section>
+
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">快捷添加</h2>
+        <span class="tiny muted">常用份量</span>
+      </header>
+      <div class="chips" id="quickFoods"></div>
+      <p class="small muted mt-3">点一下直接加一份，之后还能删。找不到的食物往下用表单自己填。</p>
+    </section>
+  </div>
+
+  <div class="grid grid-side">
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">添加食物</h2>
+        <span class="tiny muted" id="addDateLabel"></span>
+      </header>
+      <form id="mealForm" novalidate>
+        <div class="field mb-3">
+          <label>餐次</label>
+          <div class="segmented" id="mealSeg" role="group" aria-label="选择餐次"></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="foodName">食物</label>
+            <input class="input" id="foodName" list="foodOptions" type="text" placeholder="输入或选择，如：鸡胸肉" autocomplete="off">
+            <datalist id="foodOptions"></datalist>
+          </div>
+          <div class="field">
+            <label for="foodGrams">份量（g / ml）</label>
+            <input class="input" type="number" id="foodGrams" min="1" max="2000" step="5" value="150">
+          </div>
+          <div class="field span-2">
+            <label>营养预览</label>
+            <div class="detail-box" id="foodPreview">选择食物后自动带出热量与三大营养素</div>
+          </div>
+        </div>
+
+        <div id="manualFields" class="form-grid hidden mt-3">
+          <div class="field">
+            <label for="mKcal">热量 kcal</label>
+            <input class="input" type="number" id="mKcal" min="0" max="3000" step="1" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="mProtein">蛋白质 g</label>
+            <input class="input" type="number" id="mProtein" min="0" max="300" step="0.1" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="mCarb">碳水 g</label>
+            <input class="input" type="number" id="mCarb" min="0" max="500" step="0.1" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="mFat">脂肪 g</label>
+            <input class="input" type="number" id="mFat" min="0" max="300" step="0.1" placeholder="0">
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <button class="btn btn-primary" type="submit">添加到当天</button>
+          <button class="btn btn-ghost" type="button" id="clearMealForm">清空</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">近 7 天热量</h2>
+        <span class="tiny muted">单位 kcal</span>
+      </header>
+      <div class="chart" id="dietChart"></div>
+    </section>
+  </div>
+
+  <section class="card mt-4 fade-up">
+    <header class="card-head">
+      <h2 class="h2">当天记录</h2>
+      <span class="tiny muted" id="mealCount"></span>
+    </header>
+    <div id="mealGroups"></div>
+  </section>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-diet.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>统计 · FitLog 训练日志</title>
+<meta name="description" content="训练热力图、每周次数与容量、部位分布、个人最佳重量与热量达成率。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="stats">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">数据统计</p>
+      <h1 class="h1">练了多少，一目了然</h1>
+      <p>把训练和饮食记录变成趋势，比凭感觉更靠谱。</p>
+    </div>
+    <span class="tag tag-brand" id="rangeTag">近 12 周</span>
+  </div>
+
+  <section class="grid grid-4" aria-label="关键指标">
+    <article class="card stat fade-up">
+      <p class="stat-label">近 30 天训练</p>
+      <p class="stat-value"><span class="num" id="statSessions">0</span><small>次</small></p>
+      <p class="stat-sub" id="statSessionsSub">共 0 分钟</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">总训练容量</p>
+      <p class="stat-value"><span class="num" id="statVolume">0</span><small>kg</small></p>
+      <p class="stat-sub">重量 × 组数 × 次数</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">平均每日热量</p>
+      <p class="stat-value"><span class="num" id="statKcal">0</span><small>kcal</small></p>
+      <p class="stat-sub" id="statKcalSub">目标 0</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">蛋白质达成率</p>
+      <p class="stat-value"><span class="num" id="statProtein">0</span><small>%</small></p>
+      <p class="stat-sub" id="statProteinSub">近 14 天平均</p>
+    </article>
+  </section>
+
+  <section class="grid grid-side">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">训练热力图</h2>
+        <div class="legend">
+          <span>少</span>
+          <i style="background:var(--surface-3)"></i>
+          <i style="background:color-mix(in srgb, var(--brand) 26%, var(--surface-3))"></i>
+          <i style="background:color-mix(in srgb, var(--brand) 48%, var(--surface-3))"></i>
+          <i style="background:color-mix(in srgb, var(--brand) 70%, var(--surface-3))"></i>
+          <i style="background:var(--brand)"></i>
+          <span>多</span>
+        </div>
+      </header>
+      <div id="heatmap" aria-label="最近 12 周训练热力图"></div>
+      <p class="small muted mt-3">每一列是一周（周一到周日），格子越亮当天训练时间越长。</p>
+    </article>
+
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">训练部位分布</h2>
+        <span class="tiny muted">全部记录</span>
+      </header>
+      <div id="typeDonut" style="display:flex;flex-direction:column;align-items:center"></div>
+    </article>
+  </section>
+
+  <section class="grid grid-2">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">每周训练次数</h2>
+        <span class="tiny muted">近 8 周</span>
+      </header>
+      <div class="chart" id="sessionsChart"></div>
+    </article>
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">每周训练容量</h2>
+        <span class="tiny muted">单位 kg</span>
+      </header>
+      <div class="chart" id="volumeChart"></div>
+    </article>
+  </section>
+
+  <section class="grid grid-2">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">个人最佳（最大重量）</h2>
+        <span class="tiny muted">来自训练记录</span>
+      </header>
+      <ul class="list" id="prList"></ul>
+    </article>
+
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">身体变化</h2>
+        <a class="link" href="body.html">去记录 →</a>
+      </header>
+      <ul class="list" id="bodySummary"></ul>
+    </article>
+  </section>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-stats.js"></script>
+</body>
+</html>

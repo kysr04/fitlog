@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关于 · FitLog 训练日志</title>
+<meta name="description" content="FitLog 使用说明、目标设置与数据管理：导出备份、导入恢复、清空数据。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="about">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">关于</p>
+      <h1 class="h1">FitLog · 训练日志</h1>
+      <p>一个纯前端的健身记录工具：训练、饮食、身体数据，全部存在你自己的浏览器里。</p>
+    </div>
+    <span class="tag tag-brand">v1.0 · 本地存储</span>
+  </div>
+
+  <section class="grid grid-3" aria-label="功能概览">
+    <article class="card fade-up">
+      <p class="stat-label">训练记录</p>
+      <p class="small muted mt-2">按部位记录动作、组数、重量、时长与强度，自动算训练容量和估算消耗，支持模板一键填充。</p>
+    </article>
+    <article class="card fade-up">
+      <p class="stat-label">饮食记录</p>
+      <p class="small muted mt-2">内置 28 种常见食物，按份量自动算热量与三大营养素；没收录的食物可以手动填。</p>
+    </article>
+    <article class="card fade-up">
+      <p class="stat-label">趋势统计</p>
+      <p class="small muted mt-2">体重趋势、训练热力图、周容量、部位分布、个人最佳重量，全部由本地记录实时计算。</p>
+    </article>
+  </section>
+
+  <div class="grid grid-side">
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">目标设置</h2>
+        <span class="tiny muted">保存后全局生效</span>
+      </header>
+      <form id="settingsForm" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="sName">昵称</label>
+            <input class="input" id="sName" type="text" maxlength="12" placeholder="训练者">
+          </div>
+          <div class="field">
+            <label for="sHeight">身高（cm）</label>
+            <input class="input" id="sHeight" type="number" min="120" max="230" step="0.5">
+          </div>
+          <div class="field">
+            <label for="sStartWeight">起始体重（kg）</label>
+            <input class="input" id="sStartWeight" type="number" min="20" max="300" step="0.1">
+          </div>
+          <div class="field">
+            <label for="sGoalWeight">目标体重（kg）</label>
+            <input class="input" id="sGoalWeight" type="number" min="20" max="300" step="0.1">
+          </div>
+          <div class="field">
+            <label for="sKcalGoal">每日热量目标（kcal）</label>
+            <input class="input" id="sKcalGoal" type="number" min="800" max="6000" step="10">
+          </div>
+          <div class="field">
+            <label for="sProteinGoal">每日蛋白质目标（g）</label>
+            <input class="input" id="sProteinGoal" type="number" min="20" max="400" step="5">
+          </div>
+          <div class="field">
+            <label for="sCarbGoal">每日碳水目标（g）</label>
+            <input class="input" id="sCarbGoal" type="number" min="20" max="800" step="5">
+          </div>
+          <div class="field">
+            <label for="sFatGoal">每日脂肪目标（g）</label>
+            <input class="input" id="sFatGoal" type="number" min="10" max="300" step="5">
+          </div>
+          <div class="field">
+            <label for="sWeeklyGoal">每周训练目标（次）</label>
+            <input class="input" id="sWeeklyGoal" type="number" min="1" max="14" step="1">
+          </div>
+        </div>
+        <div class="row mt-3">
+          <button class="btn btn-primary" type="submit">保存设置</button>
+          <button class="btn btn-ghost" type="button" id="resetSettings">恢复默认</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">数据管理</h2>
+        <span class="tiny muted">只在本机</span>
+      </header>
+      <div class="stack">
+        <div class="detail-box" id="storageInfo">统计中…</div>
+        <button class="btn btn-block" type="button" id="exportBtn">导出备份（JSON）</button>
+        <button class="btn btn-block" type="button" id="importBtn">从 JSON 恢复</button>
+        <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+        <button class="btn btn-block" type="button" id="seedBtn">重新载入示例数据</button>
+        <button class="btn btn-block btn-danger" type="button" id="clearBtn">清空全部数据</button>
+      </div>
+      <p class="small muted mt-3">换电脑、换浏览器或清理浏览器数据前，先导出一份 JSON 备份。</p>
+    </section>
+  </div>
+
+  <section class="card mt-4 fade-up">
+    <header class="card-head"><h2 class="h2">使用说明</h2></header>
+    <div class="grid grid-2" style="margin-bottom:0">
+      <div class="stack">
+        <h3 class="h3">怎么打开</h3>
+        <p class="small muted">双击 <b>index.html</b>，用 Chrome / Edge 打开即可。全部是静态文件，不需要安装环境，也不需要联网。</p>
+        <h3 class="h3 mt-2">数据存在哪</h3>
+        <p class="small muted">浏览器 localStorage（键名 <code>fitlog.v1</code>）。不会上传任何数据；清理浏览器数据会一起清掉，所以建议定期导出备份。</p>
+      </div>
+      <div class="stack">
+        <h3 class="h3">记录建议</h3>
+        <p class="small muted">训练当天记「部位 + 动作 + 重量 × 组数 × 次数」，饮食按实际份量记，体重固定早上空腹称。坚持两周，趋势图就有意义了。</p>
+        <h3 class="h3 mt-2">技术说明</h3>
+        <p class="small muted">原生 HTML / CSS / JavaScript，无框架无构建；图表是手写 SVG；深色 / 浅色主题用 CSS 变量切换；响应式适配手机。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-about.js"></script>
+</body>
+</html>

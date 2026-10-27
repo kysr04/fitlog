@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>身体 · FitLog 训练日志</title>
+<meta name="description" content="记录体重和体脂率，查看体重趋势、BMI 和与目标的距离。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="body">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">身体数据</p>
+      <h1 class="h1">体重与体脂</h1>
+      <p>早上空腹称最准，看周均值比看单天更有意义。</p>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="about.html">身高 / 目标设置 →</a>
+  </div>
+
+  <section class="grid grid-4" aria-label="身体数据概览">
+    <article class="card stat fade-up">
+      <p class="stat-label">当前体重</p>
+      <p class="stat-value"><span class="num" id="bodyWeight">--</span><small>kg</small></p>
+      <p class="stat-sub" id="bodyWeightSub">还没有记录</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">体脂率</p>
+      <p class="stat-value"><span class="num" id="bodyFat">--</span><small>%</small></p>
+      <p class="stat-sub" id="bodyFatSub">没有记录体脂</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">BMI</p>
+      <p class="stat-value"><span class="num" id="bodyBmi">--</span></p>
+      <p class="stat-sub" id="bodyBmiSub">需要身高和体重</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">距目标体重</p>
+      <p class="stat-value"><span class="num" id="bodyGoalDiff">--</span><small>kg</small></p>
+      <p class="stat-sub" id="bodyGoalSub">目标 0 kg</p>
+    </article>
+  </section>
+
+  <section class="card fade-up" style="margin-bottom:16px">
+    <header class="card-head">
+      <h2 class="h2">体重趋势</h2>
+      <div class="segmented" id="rangeSeg" role="group" aria-label="时间范围">
+        <button type="button" class="is-active" data-range="30">近 30 天</button>
+        <button type="button" data-range="90">近 90 天</button>
+        <button type="button" data-range="all">全部</button>
+      </div>
+    </header>
+    <div class="chart" id="weightChart"></div>
+    <p class="small muted mt-3" id="weightInsight"></p>
+  </section>
+
+  <div class="grid grid-2">
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">新增记录</h2>
+        <span class="tiny muted">日期重复会覆盖</span>
+      </header>
+      <form id="bodyForm" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="bDate">日期 *</label>
+            <input class="input" type="date" id="bDate" required>
+          </div>
+          <div class="field">
+            <label for="bWeight">体重 kg *</label>
+            <input class="input" type="number" id="bWeight" min="20" max="300" step="0.1" placeholder="例如 70.5">
+          </div>
+          <div class="field">
+            <label for="bBodyfat">体脂率 %（可选）</label>
+            <input class="input" type="number" id="bBodyfat" min="3" max="60" step="0.1" placeholder="例如 18.5">
+          </div>
+          <div class="field">
+            <label>提示</label>
+            <p class="small muted" style="padding-top:9px">同一天只保留一条，补录会直接覆盖。</p>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block mt-3" type="submit">保存</button>
+      </form>
+      <p class="small muted mt-3" id="bodyTip">建议固定早上起床、上完厕所、空腹称，数据更可比。</p>
+    </section>
+
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">记录历史</h2>
+        <span class="tiny muted" id="bodyCount"></span>
+      </header>
+      <ul class="list" id="bodyList"></ul>
+    </section>
+  </div>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-body.js"></script>
+</body>
+</html>

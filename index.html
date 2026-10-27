@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>总览 · FitLog 训练日志</title>
+<meta name="description" content="FitLog —— 记录每天的训练、饮食和身体数据，纯前端本地存储。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  /* 首屏前定好主题，避免深色用户看到白屏闪烁 */
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="home">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="notice fade-up" id="demoNotice" hidden>
+    <span><strong>示例数据已载入</strong> · 为了让你先看到图表效果。清空后就是你自己的真实记录。</span>
+    <button class="btn btn-sm" id="clearDemoBtn" type="button">清空示例数据</button>
+  </div>
+
+  <section class="hero card fade-up">
+    <div class="hero-main">
+      <p class="eyebrow" id="heroGreeting">你好</p>
+      <h1 class="h1">连续 <span class="num brand-text" id="streakNum">0</span> 天打卡</h1>
+      <p class="muted" id="heroSub">今天还没有记录，从一次训练或一顿饭开始。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="train.html">记录今日训练</a>
+        <a class="btn btn-ghost" href="diet.html">记录饮食</a>
+      </div>
+    </div>
+    <div class="hero-ring" id="heroRing" aria-label="今日热量完成度"></div>
+  </section>
+
+  <section class="grid grid-4" aria-label="今日关键数据">
+    <article class="card stat fade-up">
+      <p class="stat-label">今日摄入</p>
+      <p class="stat-value"><span class="num" id="statKcal">0</span><small>kcal</small></p>
+      <p class="stat-sub" id="statKcalSub">目标 0</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">蛋白质</p>
+      <p class="stat-value"><span class="num" id="statProtein">0</span><small>g</small></p>
+      <p class="stat-sub" id="statProteinSub">目标 0 g</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">今日训练</p>
+      <p class="stat-value"><span class="num" id="statMinutes">0</span><small>分钟</small></p>
+      <p class="stat-sub" id="statWorkoutSub">还没开始</p>
+    </article>
+    <article class="card stat fade-up">
+      <p class="stat-label">当前体重</p>
+      <p class="stat-value"><span class="num" id="statWeight">--</span><small>kg</small></p>
+      <p class="stat-sub" id="statWeightSub">还没有记录</p>
+    </article>
+  </section>
+
+  <section class="grid grid-side">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">今日营养</h2>
+        <a class="link" href="diet.html">去记录 →</a>
+      </header>
+      <div class="macro-list" id="homeMacros"></div>
+      <ul class="list" id="homeMeals" style="margin-top:16px"></ul>
+    </article>
+
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">今日训练</h2>
+        <a class="link" href="train.html">去记录 →</a>
+      </header>
+      <div id="homeWorkout"></div>
+    </article>
+  </section>
+
+  <section class="grid grid-2">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">近 7 天摄入</h2>
+        <span class="tiny muted">单位 kcal</span>
+      </header>
+      <div class="chart" id="homeCalChart"></div>
+    </article>
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">体重趋势</h2>
+        <a class="link" href="body.html">详情 →</a>
+      </header>
+      <div class="chart" id="homeWeightChart"></div>
+    </article>
+  </section>
+
+  <section class="grid grid-2">
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">今日建议</h2>
+        <span class="tag tag-brand">自动生成</span>
+      </header>
+      <ul class="list" id="homeTips"></ul>
+    </article>
+    <article class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">最近记录</h2>
+        <a class="link" href="stats.html">看统计 →</a>
+      </header>
+      <ul class="timeline" id="homeRecent"></ul>
+    </article>
+  </section>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-home.js"></script>
+</body>
+</html>

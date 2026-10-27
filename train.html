@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>训练 · FitLog 训练日志</title>
+<meta name="description" content="记录每次训练：部位、动作、组数、重量、时长，自动计算训练容量与消耗。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f02'/%3E%3Cpath d='M18 22v20M12 26v12M46 22v20M52 26v12M18 32h28' stroke='%23c3f53c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('fitlog.v1');
+      if (raw) {
+        var s = JSON.parse(raw);
+        var th = s && s.settings && s.settings.theme;
+        if (th) document.documentElement.dataset.theme = th;
+      }
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body data-page="train">
+<div id="shell-top"></div>
+
+<main class="container">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">训练</p>
+      <h1 class="h1">记录今天的训练</h1>
+      <p>动作、组数、重量填进去，训练容量和消耗自动算好。</p>
+    </div>
+    <div class="row">
+      <span class="tag tag-brand" id="weekTag">本周 0 / 4 次</span>
+      <span class="tag" id="streakTag">连续 0 天</span>
+    </div>
+  </div>
+
+  <div class="grid grid-side">
+    <section class="card fade-up">
+      <header class="card-head">
+        <h2 class="h2">新建训练</h2>
+        <span class="tiny muted">日期 / 部位 / 时长 必填</span>
+      </header>
+
+      <form id="workoutForm" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="wDate">日期 *</label>
+            <input class="input" type="date" id="wDate" required>
+          </div>
+          <div class="field">
+            <label for="wMinutes">时长（分钟）*</label>
+            <input class="input" type="number" id="wMinutes" min="1" max="300" step="1" placeholder="例如 60">
+          </div>
+          <div class="field span-2">
+            <label>训练部位 *</label>
+            <div class="chips" id="typeChips" role="group" aria-label="选择训练部位"></div>
+          </div>
+          <div class="field span-2">
+            <label for="wIntensity">强度</label>
+            <select class="select" id="wIntensity">
+              <option value="低">低 · 恢复日，主要找感觉</option>
+              <option value="中" selected>中 · 常规训练</option>
+              <option value="高">高 · 冲重量 / 力竭组</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="row between mb-2">
+          <h3 class="h3">动作明细</h3>
+          <div class="row">
+            <button class="btn btn-sm" type="button" id="loadTemplateBtn">用模板填充</button>
+            <button class="btn btn-sm" type="button" id="addRowBtn">＋ 加一个动作</button>
+          </div>
+        </div>
+        <datalist id="exerciseOptions"></datalist>
+        <div class="exercise-rows" id="exerciseRows"></div>
+
+        <div class="field mt-3">
+          <label for="wNote">备注</label>
+          <textarea class="textarea" id="wNote" rows="2" placeholder="今天状态、哪组最顶、下次注意什么……"></textarea>
+        </div>
+
+        <p class="small muted mt-2" id="formSummary">还没有动作</p>
+
+        <div class="row mt-3">
+          <button class="btn btn-primary" type="submit" id="saveBtn">保存训练记录</button>
+          <button class="btn btn-ghost" type="button" id="resetFormBtn">清空表单</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="stack">
+      <section class="card fade-up">
+        <header class="card-head">
+          <h2 class="h2">近 6 周容量</h2>
+          <span class="tiny muted">单位 kg</span>
+        </header>
+        <div class="chart" id="weekVolumeChart"></div>
+      </section>
+
+      <section class="card fade-up">
+        <header class="card-head">
+          <h2 class="h2">快捷模板</h2>
+          <span class="tiny muted">点一下填充</span>
+        </header>
+        <div class="chips" id="templateChips"></div>
+        <p class="small muted mt-3">模板只是起点，动作和重量都可以改成你自己的。</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="card mt-4 fade-up">
+    <header class="card-head">
+      <h2 class="h2">训练历史</h2>
+      <span class="tiny muted" id="historyCount"></span>
+    </header>
+    <div id="historyList"></div>
+  </section>
+</main>
+
+<div id="shell-bottom"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-train.js"></script>
+</body>
+</html>
